@@ -35,7 +35,7 @@ class Header extends Component {
 		const data = {
 			token: localStorage.getItem('sessionToken')
 		};
-		return Axios.post('http://35.247.147.177/api/user', data).then((x) => {
+		return Axios.post('http://35.247.147.177:3001/api/user', data).then((x) => {
 			this.setState({ username: x.data.username });
 		});
 	}
