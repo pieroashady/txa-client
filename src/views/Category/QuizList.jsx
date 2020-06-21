@@ -190,7 +190,7 @@ class QuizList extends Component {
 		const data = {
 			categoryId: this.props.match.params.id
 		};
-		return axios.post(this.baseUrl('quiz/category'), data).then((response) => {
+		return axios.post(baseurl('quiz/category'), data).then((response) => {
 			console.log(response.data);
 			this.setState({ reco: response.data });
 		});
