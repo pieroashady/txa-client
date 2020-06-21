@@ -24,7 +24,7 @@ class Login extends Component {
 	handleLogin(e) {
 		e.preventDefault();
 		this.setState({ login: true });
-		const url = 'http://localhost:5000/api/login';
+		const url = 'http://35.247.147.177:3001/api/login';
 		const creds = {
 			username: this.state.username,
 			password: this.state.password
@@ -50,13 +50,13 @@ class Login extends Component {
 			})
 			.catch((err) => {
 				console.log('gagal');
-				this.setState({ login: false });
+				this.setState({ login: false, error: err });
 				console.log(err);
 			});
 	}
 
 	getHelloWorld() {
-		const url = 'http://localhost:5000/hello';
+		const url = 'http://35.247.147.177:3001/hello';
 		axios.get(url).then(({ data }) => {
 			this.setState({ hello: data });
 		});
