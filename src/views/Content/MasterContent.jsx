@@ -244,7 +244,7 @@ class MasterContent extends Component {
 	getCategory() {
 		this.setState({ loading: true });
 
-		const url = 'http://localhost:5000/api/content/list';
+		const url = 'http://35.247.147.177:3001/api/content/list';
 
 		return Axios.get(url)
 			.then((response) => {
