@@ -66,11 +66,11 @@ class MasterCategory extends Component {
 			quizCategory,
 			subtitle,
 			desc,
-			schedule: moment(schedulex, moment.defaultFormat).toDate(),
+			schedule: schedulex,
 			timeInMinutes: parseInt(timeInMinutes),
 			batch: sort(batch).asc()
 		};
-		console.log(this.state.schedulex.toDate());
+		//console.log(this.state.schedulex.toDate());
 		console.log(moment(schedule, moment.defaultFormat).toDate());
 
 		Axios.post(baseurl('category/add'), data)
@@ -161,6 +161,7 @@ class MasterCategory extends Component {
 
 	handleUpdate(e) {
 		e.preventDefault();
+		this.setState({ loading: true });
 		const {
 			quizCategory,
 			subtitle,
@@ -175,7 +176,7 @@ class MasterCategory extends Component {
 			category: quizCategory,
 			subtitle,
 			desc,
-			schedule: moment(schedule, moment.defaultFormat),
+			schedule: schedulex,
 			timeInMinutes: parseInt(timeInMinutes),
 			batch: sort(batch).asc()
 		};
@@ -188,7 +189,8 @@ class MasterCategory extends Component {
 				//window.location.reload(false);
 				this.setState({
 					category: newCategory,
-					editMode: false
+					editMode: false,
+					loading: false
 				});
 			})
 			.catch((err) => console.log(err));
@@ -240,6 +242,7 @@ class MasterCategory extends Component {
 					title="Delete confirmation"
 					handleHide={() => this.setState({ deleteMode: false })}
 					handleSave={this.handleDelete}
+					loading={loading}
 					body={'Delete category ' + this.state.categoryDesc + ' ?'}
 				/>
 				<ModalHandler
@@ -342,7 +345,7 @@ class MasterCategory extends Component {
 								/>
 							</Form.Group>
 							<Button variant="primary" type="submit">
-								Submit
+								{loading ? 'Updating...' : 'Submit'}
 							</Button>
 						</Form>
 					}
@@ -406,16 +409,10 @@ class MasterCategory extends Component {
 							<Form.Group>
 								<Form.Label>Schedule</Form.Label>
 								<DateTime
-									value={this.state.schedule}
+									//value={this.state.schedule}
 									onChange={(momentz) => {
 										this.setState({
-											schedule: momentz.format('DD/MM/YYYY [at] hh:mm:ss')
-										});
-										this.setState({
-											schedulex: moment(
-												this.state.schedule,
-												moment.defaultFormat
-											)
+											schedulex: momentz.toDate()
 										});
 									}}
 									inputProps={{

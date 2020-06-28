@@ -18,7 +18,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import ChartistGraph from 'react-chartist';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { Grid, Row, Col, Spinner } from 'react-bootstrap';
 
 import { Card } from 'components/Card/Card.jsx';
 import { StatsCard } from 'components/StatsCard/StatsCard.jsx';
@@ -37,6 +37,8 @@ import {
 } from 'variables/Variables.jsx';
 import { baseurl } from 'utils/baseurl';
 import Axios from 'axios';
+import moment from 'moment';
+import { Link } from 'react-router-dom';
 
 class Dashboard extends Component {
 	constructor(props) {
@@ -46,7 +48,13 @@ class Dashboard extends Component {
 			totalContent: 0,
 			totalQuiz: 0,
 			totalAbsensi: 0,
-			percentage: {}
+			percentage: [],
+			passed: 0,
+			failed: 0,
+			scoreLength: 0,
+			passedPercentage: 0,
+			failedPercentage: 0,
+			loading: false
 		};
 	}
 
@@ -58,10 +66,39 @@ class Dashboard extends Component {
 	}
 
 	getPercentage() {
-		Axios.get(baseurl('score/percentage')).then((x) => {
-			console.log(x);
-			this.setState({ percentage: x.data });
-		});
+		this.setState({ loading: true });
+		let passed = 0;
+		let failed = 0;
+		let passedPercentage = 0;
+		let failedPercentage = 0;
+
+		Axios.get(baseurl('score/week'))
+			.then(({ data }) => {
+				console.log(data);
+				data.map((x, i) => {
+					if (x.passed == true) {
+						passed++;
+					} else if (x.passed == false) {
+						failed++;
+					}
+				});
+				passedPercentage = passed / data.length * 100;
+				failedPercentage = failed / data.length * 100;
+				console.log('pass', passed);
+				console.log('failed', failed);
+				console.log('passPer', passedPercentage);
+				console.log('failedPer', failedPercentage);
+				this.setState({
+					percentage: data,
+					passed,
+					failed,
+					scoreLength: data.length,
+					passedPercentage,
+					failedPercentage,
+					loading: false
+				});
+			})
+			.catch((err) => console.log(err));
 	}
 
 	getTotalTrainee() {
@@ -94,60 +131,102 @@ class Dashboard extends Component {
 		return legend;
 	}
 	render() {
-		const { totalTrainee, totalAbsensi, totalContent, totalQuiz, percentage } = this.state;
-		const dataPiex = {
-			labels: [ `${percentage.passed}%`, `${percentage.failed}%` ],
-			series: [ percentage.passed, percentage.failed ]
+		const {
+			totalTrainee,
+			passedPercentage,
+			failedPercentage,
+			totalContent,
+			totalQuiz,
+			percentage,
+			loading,
+			scoreLength
+		} = this.state;
+		let dataPiex = {
+			labels: [
+				`${passedPercentage}%`,
+				failedPercentage == 0 ? 'Lulus 100%' : failedPercentage + '%'
+			],
+			series: [ passedPercentage, failedPercentage ]
+		};
+		let legendPiex = {
+			names: [ 'Lulus', 'Gagal' ],
+			types: [ 'info', 'danger' ]
 		};
 
 		return (
 			<div className="content">
-				<Row>
-					<Col lg={3} sm={6}>
-						<StatsCard
-							bigIcon={<i className="pe-7s-graph2 text-success" />}
-							statsText="TRAINEE"
-							statsValue={totalTrainee}
-						/>
-					</Col>
-					<Col lg={3} sm={6}>
-						<StatsCard
-							bigIcon={<i className="pe-7s-graph2 text-danger" />}
-							statsText="CONTENT"
-							statsValue={totalContent}
-						/>
-					</Col>
-					<Col lg={3} sm={6}>
-						<StatsCard
-							bigIcon={<i className="pe-7s-graph2 text-primary" />}
-							statsText="QUIZ"
-							statsValue={totalQuiz}
-						/>
-					</Col>
-					<Col lg={3} sm={6}>
-						<StatsCard
-							bigIcon={<i className="pe-7s-graph2 text-danger" />}
-							statsText="ABSENSI"
-							statsValue="45"
-						/>
-					</Col>
-				</Row>
-				<Row>
-					<Col lg={6} sm={6}>
-						<Card
-							statsIcon="fa fa-clock-o"
-							title="Presentase kelulusan quiz"
-							category="Last Campaign Performance"
-							stats="Campaign sent 2 days ago"
-							content={
-								<div id="chartPreferences" className="ct-chart ct-perfect-fourth">
-									<ChartistGraph data={dataPiex} type="Pie" />
-								</div>
-							}
-							legend={<div className="legend">{this.createLegend(legendPie)}</div>}
-						/>
-					</Col>
-					<Col lg={6} sm={6}>
+				{loading ? (
+					<div style={{ textAlign: 'center' }}>
+						<Spinner animation="border" role="status" />
+						<p>Sedang memuat...</p>
+					</div>
+				) : (
+					<div>
+						<Row>
+							<Col lg={3} sm={6}>
+								<Link to="/admin/trainee" style={{ color: 'inherit' }}>
+									<StatsCard
+										bigIcon={<i className="pe-7s-users text-success" />}
+										statsText="TRAINEE"
+										statsValue={totalTrainee}
+									/>
+								</Link>
+							</Col>
+							<Col lg={3} sm={6}>
+								<Link to="/admin/content" style={{ color: 'inherit' }}>
+									<StatsCard
+										bigIcon={<i className="pe-7s-notebook text-danger" />}
+										statsText="CONTENT"
+										statsValue={totalContent}
+									/>
+								</Link>
+							</Col>
+							<Col lg={3} sm={6}>
+								<Link to="/admin/category" style={{ color: 'inherit' }}>
+									<StatsCard
+										bigIcon={<i className="pe-7s-edit text-primary" />}
+										statsText="QUIZ"
+										statsValue={totalQuiz}
+									/>
+								</Link>
+							</Col>
+							<Col lg={3} sm={6}>
+								<Link to="/admin/score/list" style={{ color: 'inherit' }}>
+									<StatsCard
+										bigIcon={<i className="pe-7s-compass text-warning" />}
+										statsText="Quiz mingguan"
+										statsValue={scoreLength + ' data'}
+									/>
+								</Link>
+							</Col>
+						</Row>
+
+						<Row className="justify-content-center">
+							<Col lg={6} sm={6} className="justify-content-center">
+								<Card
+									statsIcon="fa fa-clock-o"
+									title="Presentase kelulusan quiz"
+									category="Statistik data minggu ini"
+									stats={
+										'Dimuat pada ' +
+										moment().format('DD/MM/YYYY [pukul] HH:mm:ss')
+									}
+									content={
+										<div
+											id="chartPreferences"
+											className="ct-chart ct-perfect-fourth"
+										>
+											<ChartistGraph data={dataPiex} type="Pie" />
+										</div>
+									}
+									legend={
+										<div className="legend">
+											{this.createLegend(legendPiex)}
+										</div>
+									}
+								/>
+							</Col>
+							{/* <Col lg={6} sm={6}>
 						<Card
 							statsIcon="fa fa-clock-o"
 							title="Presentase keterlambatan hari ini"
@@ -155,13 +234,15 @@ class Dashboard extends Component {
 							stats="Campaign sent 2 days ago"
 							content={
 								<div id="chartPreferences" className="ct-chart ct-perfect-fourth">
-									<ChartistGraph data={dataPiex} type="Pie" />
+									<ChartistGraph data={dataPie} type="Pie" />
 								</div>
 							}
 							legend={<div className="legend">{this.createLegend(legendPie)}</div>}
 						/>
-					</Col>
-				</Row>
+					</Col> */}
+						</Row>
+					</div>
+				)}
 			</div>
 		);
 	}

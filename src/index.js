@@ -36,7 +36,8 @@ import Modal from 'components/Modal/Modal';
 import Parse from 'parse';
 import * as env from './env';
 
-Parse.initialize(env.APPLICATION_ID, env.JAVASCRIPT_KEY, env.MASTER_KEY);
+Parse.initialize(env.APPLICATION_ID, env.JAVASCRIPT_KEY);
+Parse.masterKey = env.MASTER_KEY;
 Parse.serverURL = env.SERVER_URL;
 
 ReactDOM.render(

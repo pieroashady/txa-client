@@ -8,10 +8,13 @@
 		"chartist": "0.10.1",
 		"cors": "^2.8.5",
 		"dotenv": "^8.2.0",
+		"express": "^4.17.1",
+		"express-favicon": "^2.0.1",
 		"fast-sort": "^2.2.0",
 		"moment": "^2.26.0",
 		"node-sass": "4.13.1",
 		"parse": "^2.13.0",
+		"path": "^0.12.7",
 		"react": "16.8.6",
 		"react-bootstrap": "^1.0.1",
 		"react-chartist": "0.13.3",
@@ -32,7 +35,7 @@
 		"typescript": "3.4.3"
 	},
 	"scripts": {
-		"start": "react-scripts start",
+		"start": "node server.js",
 		"build": "react-scripts build",
 		"test": "react-scripts test --env=jsdom",
 		"eject": "react-scripts eject",
@@ -42,7 +45,11 @@
 		"map-sass": "node-sass src/assets/sass/light-bootstrap-dashboard-react.scss src/assets/css/light-bootstrap-dashboard-react.css --source-map true"
 	},
 	"browserslist": {
-		"production": [ ">0.2%", "not dead", "not op_mini all" ],
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
 		"development": [
 			"last 1 chrome version",
 			"last 1 firefox version",

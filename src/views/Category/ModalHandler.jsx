@@ -23,7 +23,7 @@ class ModalHandler extends Component {
 						Close
 					</Button>
 					<Button variant="primary" onClick={this.props.handleSave}>
-						Save Changes
+						{this.props.loading ? 'Deleting...' : 'Save changes'}
 					</Button>
 				</Modal.Footer>
 			</Modal>

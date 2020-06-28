@@ -71,11 +71,6 @@ class AdminNavbarLinks extends Component {
 					</Nav.Link>
 				</Nav.Item>
 				<Nav.Item as="li">
-					<Nav.Link eventKey="link-1" style={{ textAlign: 'center' }}>
-						Account
-					</Nav.Link>
-				</Nav.Item>
-				<Nav.Item as="li">
 					<Nav.Link
 						eventKey="link-2"
 						style={{ textAlign: 'center' }}

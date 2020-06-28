@@ -20,6 +20,7 @@ import { Navbar, Container, Nav, NavDropdown } from 'react-bootstrap';
 
 import AdminNavbarLinks from './AdminNavbarLinks.jsx';
 import Axios from 'axios';
+import Parse from 'parse';
 
 class Header extends Component {
 	constructor(props) {
@@ -29,15 +30,22 @@ class Header extends Component {
 			sidebarExists: false,
 			username: ''
 		};
+		this.getUser = this.getUser.bind(this);
 	}
 	componentDidMount() {
 		console.log('mount');
-		const data = {
-			token: localStorage.getItem('sessionToken')
-		};
-		return Axios.post('http://35.247.147.177:3001/api/user', data).then((x) => {
-			this.setState({ username: x.data.username });
-		});
+		this.getUser();
+		// const data = {
+		// 	token: localStorage.getItem('sessionToken')
+		// };
+		// return Axios.post('http://35.247.147.177:3001/api/user', data).then((x) => {
+		// 	this.setState({ username: x.data.username });
+		// });
+	}
+
+	getUser() {
+		const user = Parse.User.current();
+		this.setState({ username: user.get('fullname').split(' ')[0] });
 	}
 	mobileSidebarToggle(e) {
 		if (this.state.sidebarExists === false) {

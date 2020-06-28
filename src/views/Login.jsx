@@ -4,6 +4,7 @@ import { Form, Col, Button, Spinner, Alert } from 'react-bootstrap';
 import { login } from 'utils';
 import { useHistory } from 'react-router';
 import '../assets/css/my.css';
+import Parse from 'parse';
 
 class Login extends Component {
 	constructor(props) {
@@ -24,35 +25,64 @@ class Login extends Component {
 	handleLogin(e) {
 		e.preventDefault();
 		this.setState({ login: true });
-		const url = 'http://35.247.147.177:3001/api/login';
+		const url = 'http://35.247.147.177:3001/api/admin/login';
 		const creds = {
 			username: this.state.username,
 			password: this.state.password
 		};
 		console.log(creds);
-		return axios
-			.post(url, creds)
-			.then((x) => {
-				if (x.data.code === 101) {
-					this.setState({ error: x.data.message });
+		Parse.User
+			.logIn(this.state.username, this.state.password)
+			.then(({ attributes }) => {
+				console.log(attributes);
+				if (attributes.role !== 'admin') {
+					this.setState({ error: 'not admin' });
 					console.log(this.state.error);
 					alert(this.state.error);
 					return;
-				} else {
-					login();
-					console.log(x.data);
-					localStorage.setItem('sessionToken', x.data.sessionToken);
-					localStorage.setItem('userInfo', x.data);
-					this.props.history.push('/admin/category');
-					this.setState({ login: false });
 				}
-				// return useHistory().push('/admin/table');
+				login();
+				// console.log(x.data);
+				// localStorage.setItem('sessionToken', x.data.sessionToken);
+				// localStorage.setItem('userInfo', x.data);
+				this.props.history.push('/admin/dashboard');
+				this.setState({ login: false });
 			})
-			.catch((err) => {
-				console.log('gagal');
-				this.setState({ login: false, error: err });
-				console.log(err);
+			.catch((error) => {
+				this.setState({ error: error.message });
+				console.log(this.state.error);
+				alert(this.state.error);
+				return;
 			});
+
+		// return axios
+		// 	.post(url, creds)
+		// 	.then((x) => {
+		// 		if (x.data.code === 101) {
+		// 			this.setState({ error: x.data.message });
+		// 			console.log(this.state.error);
+		// 			alert(this.state.error);
+		// 			return;
+		// 		} else if (x.data.status === 0) {
+		// 			this.setState({ error: x.data.message });
+		// 			console.log(this.state.error);
+		// 			alert(this.state.error);
+		// 			return;
+		// 		} else {
+		// 			login();
+		// 			console.log(x.data);
+		// 			localStorage.setItem('sessionToken', x.data.sessionToken);
+		// 			localStorage.setItem('userInfo', x.data);
+		// 			this.props.history.push('/admin/dashboard');
+		// 			this.setState({ login: false });
+		// 		}
+		// 		// return useHistory().push('/admin/table');
+		// 	})
+		// 	.catch((err) => {
+		// 		console.log('gagal');
+		// 		this.setState({ login: false, error: err });
+		// 		console.log(err);
+		// 	});
 	}
 
 	getHelloWorld() {
@@ -72,13 +102,11 @@ class Login extends Component {
 					</p>
 					<Form onSubmit={this.handleLogin}>
 						<Form.Group controlId="formBasicEmail">
-							<Form.Label>Email address</Form.Label>
+							<Form.Label>Username</Form.Label>
 							<Form.Control
 								type="text"
-								placeholder="Enter email"
+								placeholder="Enter username"
 								onChange={(e) => {
-									console.log(this.state.username);
-									console.log(e.target);
 									this.setState({ username: e.target.value });
 								}}
 							/>
@@ -93,7 +121,6 @@ class Login extends Component {
 								type="password"
 								placeholder="Password"
 								onChange={(e) => {
-									console.log(this.state.password);
 									this.setState({ password: e.target.value });
 								}}
 							/>

@@ -41,6 +41,11 @@ import ModalHandler from './Category/ModalHandler';
 import moment from 'moment';
 import DateTime from 'react-datetime';
 import { Link } from 'react-router-dom';
+import * as env from '../env';
+
+Parse.initialize(env.APPLICATION_ID, env.JAVASCRIPT_KEY);
+Parse.masterKey = env.MASTER_KEY;
+Parse.serverURL = env.SERVER_URL;
 
 class UserProfile extends Component {
 	constructor(props) {
@@ -144,6 +149,7 @@ class UserProfile extends Component {
 		query
 			.get(id)
 			.then((user) => {
+				console.log(user);
 				// Updates the data we want
 				this.setState({
 					traineeId: id,
@@ -162,7 +168,7 @@ class UserProfile extends Component {
 
 	handleUpdate(e) {
 		e.preventDefault();
-
+		const token = localStorage.getItem('sessionToken');
 		this.setState({ loading: true });
 
 		const {
@@ -178,27 +184,39 @@ class UserProfile extends Component {
 			profile
 		} = this.state;
 
+		const userx = Parse.User.current();
+		console.log('user', userx.get('sessionToken'));
+
 		const User = new Parse.User();
 		const query = new Parse.Query(User);
-
-		query.get(this.state.traineeId).then((user) => {
-			user.set('username', `${username}-batch${batch}`);
-			user.set('email', email);
-			if (profile !== '') user.set('profile', new Parse.File('profile.jpg', profile));
-			user.set('dateOfBirth', dob);
-			user.set('placeOfBirth', pob);
-			user.set('phoneNumber', phoneNumber);
-			user.set('role', 'trainee');
-			user.set('fullname', fullname);
-			user.set('batch', parseInt(batch));
-			user.set('status', 1);
-			user.set('password', password);
-			user.set('out', false);
-			user.save().then((z) => {
-				this.setState({ loading: false });
-				window.location.reload(false);
-			});
-		});
+		query
+			.get(this.state.traineeId)
+			.then((user) => {
+				console.log(user);
+				user.set('username', `${username}-batch${batch}`);
+				user.set('email', email);
+				if (profile !== '') user.set('profile', new Parse.File('profile.jpg', profile));
+				user.set('dateOfBirth', dob);
+				user.set('placeOfBirth', pob);
+				user.set('phoneNumber', phoneNumber);
+				user.set('role', 'trainee');
+				user.set('fullname', fullname);
+				user.set('batch', parseInt(batch));
+				user.set('status', 1);
+				//user.set('password', password);
+				user.set('out', false);
+				user
+					.save(null, {
+						useMasterKey: true
+						// sessionToken: userx.get('sessionToken')
+					})
+					.then((z) => {
+						this.setState({ loading: false });
+						window.location.reload(false);
+					})
+					.catch((error) => console.log(error.message));
+			})
+			.catch((error) => console.log(error.message));
 	}
 
 	handleDelete() {
@@ -208,7 +226,7 @@ class UserProfile extends Component {
 
 		query.get(this.state.traineeId).then((x) => {
 			x.set('status', 0);
-			x.save().then((z) => {
+			x.save(null, { useMasterKey: true }).then((z) => {
 				this.setState({ loading: false });
 				window.location.reload(false);
 			});
@@ -391,7 +409,7 @@ class UserProfile extends Component {
 								/>
 							</Form.Group>
 
-							<Form.Group controlId="formCategory">
+							<Form.Group controlId="formCategoryxx">
 								<Form.Label>Username</Form.Label>
 								<Form.Control
 									autoCapitalize="true"
@@ -405,8 +423,6 @@ class UserProfile extends Component {
 							<Form.Group controlId="formSubtitle">
 								<Form.Label>Email</Form.Label>
 								<Form.Control
-									autoCapitalize="true"
-									autoComplete="false"
 									type="email"
 									placeholder="Enter email"
 									onChange={(e) => this.setState({ email: e.target.value })}

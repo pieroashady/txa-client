@@ -30,6 +30,7 @@ import MasterCategory from 'views/Category/MasterCategory';
 import QuizList from 'views/Category/QuizList';
 import MasterContent from 'views/Content/MasterContent';
 import UserScore from 'views/Score/UserScore';
+import ScoreList from 'views/Score/ScoreList';
 
 const dashboardRoutes = [
 	{
@@ -77,7 +78,7 @@ const dashboardRoutes = [
 		layout: '/admin'
 	},
 	{
-		path: '/profile',
+		path: '/trainee',
 		name: 'Master Trainee',
 		icon: 'pe-7s-user',
 		component: UserProfile,
@@ -88,6 +89,14 @@ const dashboardRoutes = [
 		name: 'Data Pengerjaan',
 		icon: 'pe-7s-science',
 		component: UserScore,
+		layout: '/admin',
+		invisible: true
+	},
+	{
+		path: '/score/list',
+		name: 'Data Pengerjaan',
+		icon: 'pe-7s-science',
+		component: ScoreList,
 		layout: '/admin',
 		invisible: true
 	}

@@ -23,13 +23,15 @@ import Card from 'components/Card/Card.jsx';
 import { thArray, tdArray } from 'variables/Variables.jsx';
 import { Link } from 'react-router-dom';
 import { baseurl } from 'utils/baseurl';
+import moment from 'moment';
 
 class UserScore extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			score: [],
-			loading: false
+			loading: false,
+			fullname: ''
 		};
 		this.handleAddQuestion = this.handleAddQuestion.bind(this);
 	}
@@ -50,12 +52,13 @@ class UserScore extends Component {
 
 		return axios.post(baseurl('score/user'), data).then((response) => {
 			console.log(response.data);
-			this.setState({ score: response.data });
+			let fullname = response.data[0].userId.fullname;
+			this.setState({ score: response.data, fullname });
 		});
 	}
 
 	render() {
-		const { score, loading } = this.state;
+		const { score, fullname, loading } = this.state;
 		const tooltip = <Tooltip id="button-tooltip">Simple tooltip</Tooltip>;
 		return (
 			<div className="content">
@@ -63,22 +66,7 @@ class UserScore extends Component {
 					<Row>
 						<Col md={12}>
 							<Card
-								category={
-									<Link to={`/trainee/add`}>
-										<button
-											type="button"
-											className="btn btn-labeled btn-primary"
-											onClick={() => {
-												this.handleAddQuestion(1, 2);
-											}}
-										>
-											<span className="btn-label">
-												<i className="fa fa-plus" />
-											</span>{' '}
-											{loading ? 'Loading...' : 'Add'}
-										</button>
-									</Link>
-								}
+								category={`Data pengerjaan quiz ${fullname}`}
 								ctTableFullWidth
 								ctTableResponsive
 								content={
@@ -89,6 +77,7 @@ class UserScore extends Component {
 												<th>NAMA</th>
 												<th>QUIZ</th>
 												<th>SCORE</th>
+												<th>SUBMIT</th>
 												<th>STATUS</th>
 											</tr>
 										</thead>
@@ -106,6 +95,11 @@ class UserScore extends Component {
 														<td>{prop.userId.fullname}</td>
 														<td>{prop.categoryId.category}</td>
 														<td>{prop.score}</td>
+														<td>
+															{moment(prop.createdAt).format(
+																'DD/MM/YYYY [at] HH:mm:ss'
+															)}
+														</td>
 														<td
 															style={{
 																color: `${prop.passed
