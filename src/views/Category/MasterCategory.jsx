@@ -10,6 +10,7 @@ import './datepicker.css';
 import sort from 'fast-sort';
 import { baseurl } from '../../utils/baseurl';
 import ModalHandler from './ModalHandler';
+import _ from 'lodash/lang';
 
 class MasterCategory extends Component {
 	constructor(props) {
@@ -258,6 +259,7 @@ class MasterCategory extends Component {
 									autoComplete="false"
 									type="text"
 									value={quizCategory}
+									required={true}
 									placeholder="Enter category"
 									onChange={this.handleCategory}
 								/>
@@ -269,6 +271,7 @@ class MasterCategory extends Component {
 									autoCapitalize="true"
 									autoComplete="false"
 									type="text"
+									required={true}
 									value={subtitle}
 									placeholder="Enter subtitle"
 									onChange={this.handleSubtitle}
@@ -281,6 +284,7 @@ class MasterCategory extends Component {
 									as="textarea"
 									autoCapitalize="true"
 									autoComplete="false"
+									required={true}
 									value={desc}
 									placeholder="Enter description"
 									rows={5}
@@ -312,6 +316,7 @@ class MasterCategory extends Component {
 								<Form.Control
 									autoComplete="false"
 									type="number"
+									required={true}
 									value={timeInMinutes}
 									placeholder="Waktu pengerjaan"
 									onChange={this.handleTime}
@@ -344,8 +349,18 @@ class MasterCategory extends Component {
 									onChange={this.handleDaySelect}
 								/>
 							</Form.Group>
-							<Button variant="primary" type="submit">
-								{loading ? 'Updating...' : 'Submit'}
+							<Button
+								variant={_.isEmpty(this.state.batch) ? 'default' : 'primary'}
+								type="submit"
+								disabled={_.isEmpty(this.state.batch) ? true : false}
+							>
+								{_.isEmpty(this.state.batch) ? (
+									'Pilih batch dahulu'
+								) : loading ? (
+									'Updating...'
+								) : (
+									'Submit'
+								)}
 							</Button>
 						</Form>
 					}
@@ -375,6 +390,7 @@ class MasterCategory extends Component {
 									autoCapitalize="true"
 									autoComplete="false"
 									type="text"
+									required={true}
 									value={quizCategory}
 									placeholder="Enter category"
 									onChange={this.handleCategory}
@@ -387,6 +403,7 @@ class MasterCategory extends Component {
 									autoCapitalize="true"
 									autoComplete="false"
 									type="text"
+									required={true}
 									value={subtitle}
 									placeholder="Enter subtitle"
 									onChange={this.handleSubtitle}
@@ -399,6 +416,7 @@ class MasterCategory extends Component {
 									as="textarea"
 									autoCapitalize="true"
 									autoComplete="false"
+									required={true}
 									value={desc}
 									placeholder="Enter description"
 									rows={5}
@@ -427,6 +445,7 @@ class MasterCategory extends Component {
 								<Form.Control
 									autoComplete="false"
 									type="number"
+									required={true}
 									value={timeInMinutes}
 									placeholder="Waktu pengerjaan"
 									onChange={this.handleTime}
@@ -456,19 +475,29 @@ class MasterCategory extends Component {
 									onChange={this.handleDaySelect}
 								/>
 							</Form.Group>
-							<Button variant="primary" type="submit">
-								Submit
+							<Button
+								variant={_.isEmpty(this.state.batch) ? 'default' : 'primary'}
+								type="submit"
+								disabled={_.isEmpty(this.state.batch) ? true : false}
+							>
+								{_.isEmpty(this.state.batch) ? (
+									'Pilih batch dahulu'
+								) : loading ? (
+									'Saving...'
+								) : (
+									'Submit'
+								)}
 							</Button>
 						</Form>
 					</Modal.Body>
-					<Modal.Footer>
+					{/* <Modal.Footer>
 						<Button variant="secondary" onClick={() => this.setState({ modal: false })}>
 							Close
 						</Button>
 						<Button variant="primary" onClick={() => this.setState({ modal: false })}>
 							Save Changes
 						</Button>
-					</Modal.Footer>
+					</Modal.Footer> */}
 				</Modal>
 				<Container fluid>
 					<Row>

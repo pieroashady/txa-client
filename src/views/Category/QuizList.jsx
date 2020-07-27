@@ -87,6 +87,7 @@ class QuizList extends Component {
 
 	handleUpdate(e) {
 		e.preventDefault();
+		this.setState({ loading: true });
 		const { optionA, optionB, optionC, optionD } = this.state;
 		const data = {
 			quizId: this.state.questionId,
@@ -104,10 +105,11 @@ class QuizList extends Component {
 				//window.location.reload(false);
 				this.setState({
 					reco: newReco,
-					editModal: false
+					editModal: false,
+					loading: false
 				});
 			})
-			.catch((err) => console.log(err));
+			.catch((err) => alert(err.message));
 	}
 
 	handleDelete() {
@@ -162,6 +164,7 @@ class QuizList extends Component {
 
 	handleAdd(e) {
 		e.preventDefault();
+		this.setState({ loading: true });
 		const {
 			question,
 			answers,
@@ -180,10 +183,14 @@ class QuizList extends Component {
 
 		Axios.post(baseurl('quiz/add'), data)
 			.then((x) => {
-				this.setState({ addModal: false, reco: this.state.reco.concat(x.data.x) });
+				this.setState({
+					addModal: false,
+					reco: this.state.reco.concat(x.data.x),
+					loading: false
+				});
 				console.log('success add data');
 			})
-			.catch((err) => console.log(err));
+			.catch((err) => alert(err.message));
 	}
 
 	getData() {
@@ -240,6 +247,7 @@ class QuizList extends Component {
 									autoCapitalize="true"
 									autoComplete="false"
 									type="text"
+									required={true}
 									value={question}
 									placeholder="Enter question"
 									onChange={(e) => {
@@ -254,6 +262,7 @@ class QuizList extends Component {
 									autoCapitalize="true"
 									autoComplete="false"
 									type="text"
+									required={true}
 									value={optionA}
 									placeholder="Option A"
 									onChange={(e) => {
@@ -270,6 +279,7 @@ class QuizList extends Component {
 									autoCapitalize="true"
 									autoComplete="false"
 									type="text"
+									required={true}
 									value={optionB}
 									placeholder="Option B"
 									onChange={(e) => {
@@ -287,6 +297,7 @@ class QuizList extends Component {
 									autoComplete="false"
 									type="text"
 									value={optionC}
+									required={true}
 									placeholder="Option C"
 									onChange={(e) => {
 										this.setState({
@@ -303,6 +314,7 @@ class QuizList extends Component {
 									autoComplete="false"
 									type="text"
 									value={optionD}
+									required={true}
 									placeholder="Option D"
 									onChange={(e) => {
 										this.setState({
@@ -319,6 +331,7 @@ class QuizList extends Component {
 								<Form.Control
 									as="select"
 									value={this.state.correctAnswers}
+									required={true}
 									onChange={(e) => {
 										this.setState({ correctAnswers: e.target.value });
 										console.log(e.target.value);
@@ -332,7 +345,7 @@ class QuizList extends Component {
 							</Form.Group>
 
 							<Button variant="primary" type="submit">
-								Submit
+								{loading ? 'Saving...' : 'Submit'}
 							</Button>
 						</Form>
 					}
@@ -350,6 +363,7 @@ class QuizList extends Component {
 									autoComplete="false"
 									type="text"
 									value={question}
+									required={true}
 									placeholder="Enter question"
 									onChange={(e) => {
 										this.setState({ question: e.target.value });
@@ -364,6 +378,7 @@ class QuizList extends Component {
 									autoComplete="false"
 									type="text"
 									value={optionA}
+									required={true}
 									placeholder="Option A"
 									onChange={(e) => {
 										this.setState({
@@ -380,6 +395,7 @@ class QuizList extends Component {
 									autoComplete="false"
 									type="text"
 									value={optionB}
+									required={true}
 									placeholder="Option B"
 									onChange={(e) => {
 										this.setState({
@@ -396,6 +412,7 @@ class QuizList extends Component {
 									autoComplete="false"
 									type="text"
 									value={optionC}
+									required={true}
 									placeholder="Option C"
 									onChange={(e) => {
 										this.setState({
@@ -412,6 +429,7 @@ class QuizList extends Component {
 									autoComplete="false"
 									type="text"
 									value={optionD}
+									required={true}
 									placeholder="Option D"
 									onChange={(e) => {
 										this.setState({
@@ -427,6 +445,7 @@ class QuizList extends Component {
 								<Form.Label>Jawaban</Form.Label>
 								<Form.Control
 									as="select"
+									required={true}
 									value={this.state.correctAnswers}
 									onChange={(e) => {
 										this.setState({ correctAnswers: e.target.value });
@@ -441,7 +460,7 @@ class QuizList extends Component {
 							</Form.Group>
 
 							<Button variant="primary" type="submit">
-								Submit
+								{loading ? 'Saving...' : 'Submit'}
 							</Button>
 						</Form>
 					}

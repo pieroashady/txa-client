@@ -291,6 +291,7 @@ class MasterContent extends Component {
 									autoCapitalize="true"
 									autoComplete="false"
 									type="text"
+									required={true}
 									value={contentTitle}
 									placeholder="Enter content title"
 									onChange={this.handleCategory}
@@ -304,6 +305,7 @@ class MasterContent extends Component {
 									as="textarea"
 									//maxLength={300}
 									autoComplete="false"
+									required={true}
 									type="text"
 									value={contentBody}
 									placeholder="Enter content body"
@@ -314,6 +316,7 @@ class MasterContent extends Component {
 							<Form.Group>
 								<Form.File
 									id="exampleFormControlFile1"
+									required={true}
 									label="Content image"
 									onChange={(e) => {
 										this.setState({ contentImage: e.target.files[0] });
@@ -354,6 +357,7 @@ class MasterContent extends Component {
 								<Form.Label>Content Type</Form.Label>
 								<Form.Control
 									as="select"
+									required={true}
 									value={this.state.contentType}
 									onChange={(e) => {
 										this.setState({ contentType: e.target.value });
@@ -371,6 +375,7 @@ class MasterContent extends Component {
 								<Form.Check
 									inline
 									type="checkbox"
+									required={true}
 									value={1}
 									label="Batch 1"
 									onChange={this.handleDaySelect}
@@ -379,6 +384,7 @@ class MasterContent extends Component {
 									inline
 									type="checkbox"
 									value={2}
+									required={true}
 									label="Batch 2"
 									onChange={this.handleDaySelect}
 								/>
@@ -386,6 +392,7 @@ class MasterContent extends Component {
 									inline
 									type="checkbox"
 									value={3}
+									required={true}
 									label="Batch 3"
 									onChange={this.handleDaySelect}
 								/>
@@ -421,6 +428,7 @@ class MasterContent extends Component {
 									autoCapitalize="true"
 									autoComplete="false"
 									type="text"
+									required={true}
 									//value={contentTitle}
 									placeholder="Enter content title"
 									onChange={this.handleCategory}
@@ -432,6 +440,7 @@ class MasterContent extends Component {
 								<Form.Control
 									autoCapitalize="true"
 									as="textarea"
+									required={true}
 									maxLength={200}
 									autoComplete="false"
 									type="text"
@@ -445,6 +454,7 @@ class MasterContent extends Component {
 								<Form.File
 									id="exampleFormControlFile1"
 									label="Content image"
+									required={true}
 									onChange={(e) => {
 										this.setState({ contentImage: e.target.files[0] });
 										console.log(e.target.files[0]);
@@ -484,6 +494,7 @@ class MasterContent extends Component {
 								<Form.Label>Content Type</Form.Label>
 								<Form.Control
 									as="select"
+									required={true}
 									//value={this.state.contentType}
 									onChange={(e) => {
 										this.setState({ contentType: e.target.value });
@@ -501,6 +512,7 @@ class MasterContent extends Component {
 								<Form.Check
 									inline
 									type="checkbox"
+									required={true}
 									value={1}
 									label="Batch 1"
 									onChange={this.handleDaySelect}
@@ -510,6 +522,7 @@ class MasterContent extends Component {
 									type="checkbox"
 									value={2}
 									label="Batch 2"
+									required={true}
 									onChange={this.handleDaySelect}
 								/>
 								<Form.Check
@@ -517,6 +530,7 @@ class MasterContent extends Component {
 									type="checkbox"
 									value={3}
 									label="Batch 3"
+									required={true}
 									onChange={this.handleDaySelect}
 								/>
 							</Form.Group>
@@ -525,14 +539,14 @@ class MasterContent extends Component {
 							</Button>
 						</Form>
 					</Modal.Body>
-					<Modal.Footer>
+					{/* <Modal.Footer>
 						<Button variant="secondary" onClick={() => this.setState({ modal: false })}>
 							Close
 						</Button>
 						<Button variant="primary" onClick={() => this.setState({ modal: false })}>
 							Save Changes
 						</Button>
-					</Modal.Footer>
+					</Modal.Footer> */}
 				</Modal>
 				<Container fluid>
 					<Row>

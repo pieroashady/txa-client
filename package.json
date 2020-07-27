@@ -11,6 +11,7 @@
 		"express": "^4.17.1",
 		"express-favicon": "^2.0.1",
 		"fast-sort": "^2.2.0",
+		"lodash": "^4.17.19",
 		"moment": "^2.26.0",
 		"node-sass": "4.13.1",
 		"parse": "^2.13.0",
@@ -35,7 +36,8 @@
 		"typescript": "3.4.3"
 	},
 	"scripts": {
-		"start": "node server.js",
+		"startz": "node server.js",
+		"start": "react-scripts start",
 		"build": "react-scripts build",
 		"test": "react-scripts test --env=jsdom",
 		"eject": "react-scripts eject",

@@ -16,16 +16,7 @@
 
 */
 import Dashboard from 'views/Dashboard.jsx';
-import UserProfile from 'views/UserProfile.jsx';
-import TableList from 'views/TableList.jsx';
-import Typography from 'views/Typography.jsx';
-import Icons from 'views/Icons.jsx';
-import Maps from 'views/Maps.jsx';
-import Notifications from 'views/Notifications.jsx';
-import Upgrade from 'views/Upgrade.jsx';
-import MasterQuiz from 'views/MasterQuiz';
-import Trainee from 'views/Trainee';
-import ViewTrainee from 'views/ViewTrainee';
+import UserProfile from 'views/MasterReport.jsx';
 import MasterCategory from 'views/Category/MasterCategory';
 import QuizList from 'views/Category/QuizList';
 import MasterContent from 'views/Content/MasterContent';
@@ -97,6 +88,14 @@ const dashboardRoutes = [
 		name: 'Data Pengerjaan',
 		icon: 'pe-7s-science',
 		component: ScoreList,
+		layout: '/admin',
+		invisible: true
+	},
+	{
+		path: '/report',
+		name: 'Master Report',
+		icon: 'pe-7s-science',
+		component: MasterReport,
 		layout: '/admin',
 		invisible: true
 	}
