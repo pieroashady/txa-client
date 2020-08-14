@@ -47,7 +47,7 @@ Parse.initialize(env.APPLICATION_ID, env.JAVASCRIPT_KEY);
 Parse.masterKey = env.MASTER_KEY;
 Parse.serverURL = env.SERVER_URL;
 
-class UserProfile extends Component {
+class Admin extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -94,7 +94,7 @@ class UserProfile extends Component {
 		const User = new Parse.User();
 		const query = new Parse.Query(User);
 
-		query.equalTo('role', 'trainee');
+		query.equalTo('role', 'admin');
 		query
 			.count()
 			.then((x) => {
@@ -110,10 +110,10 @@ class UserProfile extends Component {
 		this.setState({ loading: true });
 
 		const query = new Parse.Query(Parse.User);
-		query.equalTo('role', 'trainee');
-		query.equalTo('batch', this.state.batch);
-		//console.log(req.body.batch);
-		query.ascending('batch');
+		query.equalTo('role', 'admin');
+		// query.equalTo('batch', this.state.batch);
+		// //console.log(req.body.batch);
+		// query.ascending('batch');
 		query.ascending('fullname');
 		query
 			.find()
@@ -143,12 +143,8 @@ class UserProfile extends Component {
 			newDob
 		} = this.state;
 
-		let newBatch = this.state.batch;
+		//		let newBatch = this.state.batch;
 		let totalTrainee = this.state.allTrainee + 1;
-
-		if (newBatch < 10) {
-			newBatch = `0${newBatch}`;
-		}
 
 		if (totalTrainee < 10) {
 			totalTrainee = `0${totalTrainee}`;
@@ -157,22 +153,19 @@ class UserProfile extends Component {
 		console.log('newDob', newDob);
 		console.log('totalTrainee', totalTrainee);
 
-		const newCode = newBatch + newDob + totalTrainee;
-
 		const user = new Parse.User();
-		user.set('username', `${username}-batch${batch}`);
+		user.set('username', `${username}`);
 		user.set('email', email);
 		if (profile !== '') user.set('profile', new Parse.File('profile.jpg', profile));
 		user.set('dateOfBirth', dob);
 		user.set('placeOfBirth', pob);
 		user.set('phoneNumber', phoneNumber);
-		user.set('role', 'trainee');
+		user.set('role', 'admin');
 		user.set('fullname', fullname);
-		user.set('batch', parseInt(batch));
 		user.set('status', 1);
 		user.set('password', password);
 		user.set('out', false);
-		user.set('kodeTrainee', newCode);
+		user.set('kodeTrainee', `admin-${totalTrainee}`);
 		user
 			.save()
 			.then((x) => {
@@ -207,8 +200,7 @@ class UserProfile extends Component {
 					dob: user.get('dateOfBirth'),
 					pob: user.get('placeOfBirth'),
 					phoneNumber: user.get('phoneNumber'),
-					fullname: user.get('fullname'),
-					batch: user.get('batch')
+					fullname: user.get('fullname')
 				});
 			})
 			.catch((err) => console.log(err));
@@ -241,15 +233,14 @@ class UserProfile extends Component {
 			.get(this.state.traineeId)
 			.then((user) => {
 				console.log(user);
-				user.set('username', `${username}-batch${batch}`);
+				user.set('username', `${username}`);
 				user.set('email', email);
 				if (profile !== '') user.set('profile', new Parse.File('profile.jpg', profile));
 				user.set('dateOfBirth', dob);
 				user.set('placeOfBirth', pob);
 				user.set('phoneNumber', phoneNumber);
-				user.set('role', 'trainee');
+				user.set('role', 'admin');
 				user.set('fullname', fullname);
-				user.set('batch', parseInt(batch));
 				user.set('status', 1);
 				//user.set('password', password);
 				user.set('out', false);
@@ -319,12 +310,11 @@ class UserProfile extends Component {
 		const { searchBy, searchValue } = this.state;
 		const User = new Parse.User();
 		const query = new Parse.Query(User);
+		query.equalTo('role', 'admin');
 
 		switch (searchBy) {
-			case 'Kode Trainee':
-				query.notEqualTo('batch', 0);
+			case 'Kode Admin':
 				query.equalTo('kodeTrainee', searchValue);
-				query.ascending('batch');
 				query.ascending('fullname');
 				query
 					.find()
@@ -337,9 +327,7 @@ class UserProfile extends Component {
 					});
 				break;
 			case 'Nama':
-				query.notEqualTo('batch', 0);
 				query.matches('fullname', searchValue, 'i');
-				query.ascending('batch');
 				query.ascending('fullname');
 				query
 					.find()
@@ -351,36 +339,7 @@ class UserProfile extends Component {
 						this.setState({ loading: false });
 					});
 				break;
-			case 'Batch':
-				query.notEqualTo('batch', 0);
-				query.equalTo('batch', parseInt(searchValue));
-				query.ascending('batch');
-				query.ascending('fullname');
-				query
-					.find()
-					.then((x) => {
-						this.setState({ trainee: x, loading: false });
-					})
-					.catch((err) => {
-						alert(err.message);
-						this.setState({ loading: false });
-					});
-				break;
-			case 'Status':
-				query.notEqualTo('batch', 0);
-				query.equalTo('status', parseInt(searchValue));
-				query.ascending('batch');
-				query.ascending('fullname');
-				query
-					.find()
-					.then((x) => {
-						this.setState({ trainee: x, loading: false });
-					})
-					.catch((err) => {
-						alert(err.message);
-						this.setState({ loading: false });
-					});
-				break;
+
 			default:
 				break;
 		}
@@ -546,21 +505,6 @@ class UserProfile extends Component {
 								/>
 							</Form.Group>
 
-							<Form.Group controlId="formGridState">
-								<Form.Label>Batch</Form.Label>
-								<Form.Control
-									as="select"
-									onChange={(e) => {
-										this.setState({ batch: e.target.value });
-										console.log(e.target.value);
-									}}
-								>
-									{[ 1, 2, 3 ].map((x) => (
-										<option value={x}>{`Batch ${x}`}</option>
-									))}
-								</Form.Control>
-							</Form.Group>
-
 							<Form.Group controlId="formPhone">
 								<Form.Label>Phone number</Form.Label>
 								<Form.Control
@@ -581,7 +525,7 @@ class UserProfile extends Component {
 				/>
 				<ModalHandler
 					show={this.state.addMode}
-					title="Add trainee"
+					title="Add Admin"
 					handleHide={() => this.setState({ addMode: false })}
 					body={
 						<Form onSubmit={this.handleAdd}>
@@ -668,21 +612,6 @@ class UserProfile extends Component {
 								/>
 							</Form.Group>
 
-							<Form.Group controlId="formGridState">
-								<Form.Label>Batch</Form.Label>
-								<Form.Control
-									as="select"
-									onChange={(e) => {
-										this.setState({ batch: e.target.value });
-										console.log(e.target.value);
-									}}
-								>
-									{[ 1, 2, 3 ].map((x) => (
-										<option value={x}>{`Batch ${x}`}</option>
-									))}
-								</Form.Control>
-							</Form.Group>
-
 							<Form.Group controlId="formPhone">
 								<Form.Label>Phone number</Form.Label>
 								<Form.Control
@@ -711,7 +640,7 @@ class UserProfile extends Component {
 										style={{ margin: '0px' }}
 										onClick={() => this.setState({ addMode: true })}
 									>
-										<i className="fa fa-plus" /> Add trainee
+										<i className="fa fa-plus" /> Add Admin
 									</Button>
 								}
 								content={
@@ -742,10 +671,8 @@ class UserProfile extends Component {
 																	Cari berdasarkan
 																</option>
 																{[
-																	'Kode Trainee',
-																	'Nama',
-																	'Batch',
-																	'Status'
+																	'Kode Admin',
+																	'Nama'
 																].map((x) => (
 																	<option value={x}>{x}</option>
 																))}
@@ -887,4 +814,4 @@ class UserProfile extends Component {
 	}
 }
 
-export default UserProfile;
+export default Admin;

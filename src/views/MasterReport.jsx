@@ -25,15 +25,18 @@ import { Link } from 'react-router-dom';
 import { baseurl } from 'utils/baseurl';
 import moment from 'moment';
 import Parse from 'parse';
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 
 class MasterReport extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			trainee: [],
-			loading: false
+			loading: false,
+			searchValue: ''
 		};
 		this.handleAddQuestion = this.handleAddQuestion.bind(this);
+		this.handleFilter = this.handleFilter.bind(this);
 	}
 
 	componentDidMount() {
@@ -46,12 +49,87 @@ class MasterReport extends Component {
 		this.setState({ loading: true });
 	}
 
+	handleFilter(e) {
+		e.preventDefault();
+		this.setState({ loading: true });
+		const { searchBy, searchValue } = this.state;
+		const User = new Parse.User();
+		const query = new Parse.Query(User);
+
+		switch (searchBy) {
+			case 'Nomor Induk':
+				query.notEqualTo('batch', 0);
+				query.equalTo('kodeTrainee', searchValue);
+				query.ascending('batch');
+				query.ascending('fullname');
+				query
+					.find()
+					.then((x) => {
+						this.setState({ trainee: x, loading: false });
+					})
+					.catch((err) => {
+						alert(err.message);
+						this.setState({ loading: false });
+					});
+				break;
+			case 'Nama':
+				query.notEqualTo('batch', 0);
+				query.matches('fullname', searchValue, 'i');
+				query.ascending('batch');
+				query.ascending('fullname');
+				query
+					.find()
+					.then((x) => {
+						this.setState({ trainee: x, loading: false });
+					})
+					.catch((err) => {
+						alert(err.message);
+						this.setState({ loading: false });
+					});
+				break;
+			case 'Batch':
+				query.notEqualTo('batch', 0);
+				query.equalTo('batch', parseInt(searchValue));
+				query.ascending('batch');
+				query.ascending('fullname');
+				query
+					.find()
+					.then((x) => {
+						this.setState({ trainee: x, loading: false });
+					})
+					.catch((err) => {
+						alert(err.message);
+						this.setState({ loading: false });
+					});
+				break;
+			case 'Status':
+				query.notEqualTo('batch', 0);
+				query.equalTo('status', parseInt(searchValue));
+				query.ascending('batch');
+				query.ascending('fullname');
+				query
+					.find()
+					.then((x) => {
+						this.setState({ trainee: x, loading: false });
+					})
+					.catch((err) => {
+						alert(err.message);
+						this.setState({ loading: false });
+					});
+				break;
+			default:
+				break;
+		}
+	}
+
 	getData() {
 		this.setState({ loading: true });
 		const User = new Parse.User();
 		const query = new Parse.Query(User);
 
 		query.notEqualTo('batch', 0);
+		query.ascending('batch');
+		query.ascending('fullname');
 		query
 			.find()
 			.then((x) => {
@@ -66,29 +144,70 @@ class MasterReport extends Component {
 	render() {
 		const { trainee, loading } = this.state;
 		const tooltip = <Tooltip id="button-tooltip">Simple tooltip</Tooltip>;
+		const textForm = (
+			<Form.Control
+				type={this.state.searchBy === 'Batch' ? 'number' : 'text'}
+				disabled={this.state.searchBy === undefined ? true : false}
+				placeholder={
+					this.state.searchBy === undefined ? '' : `Masukkan ${this.state.searchBy}`
+				}
+				//value={startDate}
+				onChange={(e) => {
+					console.log(e.target.value);
+					this.setState({
+						searchValue: e.target.value
+					});
+				}}
+				required="true"
+			/>
+		);
+
+		const selectForm = (
+			<Form.Control
+				as="select"
+				// defaultValue={1}
+				onChange={(e) => {
+					console.log(e.target.value);
+					this.setState({
+						searchValue: e.target.value
+					});
+				}}
+				required="true"
+			>
+				<option value="">Pilih Status</option>
+				{[ 'Aktif', 'Tidak aktif' ].map((x) => (
+					<option value={x == 'Aktif' ? 1 : 0}>{x}</option>
+				))}
+			</Form.Control>
+		);
+
 		return (
 			<div className="content">
 				<Container fluid>
 					<Row>
 						<Col md={12}>
 							<Card
-								category="Data pengerjaan minggu ini"
-								ctTableFullWidth
-								ctTableResponsive
+								title={
+									<ReactHTMLTableToExcel
+										id="eskport"
+										className="btn btn-primary"
+										table="ekspor"
+										filename="tablexls"
+										sheet="tablexls"
+										buttonText="Ekspor"
+									/>
+								}
 								content={
 									<div>
 										<Row>
 											<Col>
-												<Form onSubmit={this.handleFilterCalendar}>
+												<Form onSubmit={this.handleFilter}>
 													<Form.Group
 														as={Row}
 														controlId={'formHorizontalEmail'}
 													>
-														<Col sm={2}>
-															<p>Search by</p>
-														</Col>
 														<Col
-															sm={{ span: 2 }}
+															sm={{ span: 4 }}
 															className="pull-right"
 														>
 															<Form.Control
@@ -97,34 +216,33 @@ class MasterReport extends Component {
 																onChange={(e) => {
 																	console.log(e.target.value);
 																	this.setState({
-																		status: e.target.value
+																		searchBy: e.target.value
 																	});
 																}}
 																required="true"
 															>
 																<option value="">
-																	Pilih Kategori
+																	Cari berdasarkan
 																</option>
-																{[ 4, 5, 6 ].map((x) => (
+																{[
+																	'Nomor Induk',
+																	'Nama',
+																	'Batch',
+																	'Status'
+																].map((x) => (
 																	<option value={x}>{x}</option>
 																))}
 															</Form.Control>
 														</Col>
 														<Col
-															sm={{ span: 3 }}
+															sm={{ span: 6 }}
 															className="pull-right"
 														>
-															<Form.Control
-																type="date"
-																//value={startDate}
-																onChange={(e) => {
-																	console.log(e.target.value);
-																	this.setState({
-																		startDate: e.target.value
-																	});
-																}}
-																required="true"
-															/>
+															{this.state.searchBy === 'Status' ? (
+																selectForm
+															) : (
+																textForm
+															)}
 														</Col>
 														{/* <Col sm={{ span: 3 }} className="pull-right">
 														<Form.Control
@@ -151,10 +269,10 @@ class MasterReport extends Component {
 											</Col>
 										</Row>
 										<Row>
-											<Table striped hover>
+											<Table striped hover id="ekspor">
 												<thead>
 													<tr>
-														<th>NO</th>
+														<th>NO INDUK</th>
 														<th>NAMA LENGKAP</th>
 														<th>TEMPAT / TANGGAL LAHIR</th>
 														<th>BATCH</th>
@@ -174,7 +292,7 @@ class MasterReport extends Component {
 													) : (
 														trainee.map((prop, key) => (
 															<tr key={key}>
-																<td>{key + 1}</td>
+																<td>{prop.get('kodeTrainee')}</td>
 																<td>{prop.get('fullname')}</td>
 																<td>
 																	{prop.get('placeOfBirth') +

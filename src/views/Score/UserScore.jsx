@@ -24,6 +24,7 @@ import { thArray, tdArray } from 'variables/Variables.jsx';
 import { Link } from 'react-router-dom';
 import { baseurl } from 'utils/baseurl';
 import moment from 'moment';
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 
 class UserScore extends Component {
 	constructor(props) {
@@ -66,11 +67,21 @@ class UserScore extends Component {
 					<Row>
 						<Col md={12}>
 							<Card
+								title={
+									<ReactHTMLTableToExcel
+										id="eskport"
+										className="btn btn-primary"
+										table="ekspor"
+										filename="tablexls"
+										sheet="tablexls"
+										buttonText="Ekspor"
+									/>
+								}
 								category={`Data pengerjaan quiz ${fullname}`}
 								ctTableFullWidth
 								ctTableResponsive
 								content={
-									<Table striped hover>
+									<Table striped hover id="ekspor">
 										<thead>
 											<tr>
 												<th>NO</th>

@@ -11,6 +11,7 @@ import sort from 'fast-sort';
 import { baseurl } from '../../utils/baseurl';
 import ModalHandler from './ModalHandler';
 import _ from 'lodash/lang';
+import Parse from 'parse';
 
 class MasterCategory extends Component {
 	constructor(props) {
@@ -32,6 +33,9 @@ class MasterCategory extends Component {
 			categoryId: '',
 			schedulex: moment(),
 			buttonLoading: false,
+			kodeCategory: '',
+			searchBy: '',
+			searchValue: '',
 			moment: moment().format('DD/MM/YYYY [at] hh:mm:ss')
 		};
 
@@ -41,6 +45,7 @@ class MasterCategory extends Component {
 		this.handleDesc = this.handleDesc.bind(this);
 		this.handleSubtitle = this.handleSubtitle.bind(this);
 		this.handleTime = this.handleTime.bind(this);
+		this.handleKode = this.handleKode.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.handleEdit = this.handleEdit.bind(this);
 		this.handleHide = this.handleHide.bind(this);
@@ -61,7 +66,8 @@ class MasterCategory extends Component {
 			schedule,
 			timeInMinutes,
 			batch,
-			schedulex
+			schedulex,
+			kodeCategory
 		} = this.state;
 		const data = {
 			quizCategory,
@@ -69,10 +75,10 @@ class MasterCategory extends Component {
 			desc,
 			schedule: schedulex,
 			timeInMinutes: parseInt(timeInMinutes),
-			batch: sort(batch).asc()
+			batch: sort(batch).asc(),
+			kodeCategory
 		};
-		//console.log(this.state.schedulex.toDate());
-		console.log(moment(schedule, moment.defaultFormat).toDate());
+		console.log(this.state.schedulex);
 
 		Axios.post(baseurl('category/add'), data)
 			.then((x) => {
@@ -152,7 +158,8 @@ class MasterCategory extends Component {
 						schedulex: moment(data.schedule.iso).format('DD/MM/YYYY HH:mm:ss'),
 						batch: data.batch,
 						timeInMinutes: data.timeInMinutes,
-						categoryId: id
+						categoryId: id,
+						kodeCategory: data.kodeCategory
 					},
 					() => console.log('batch', this.state.batch)
 				);
@@ -170,7 +177,8 @@ class MasterCategory extends Component {
 			schedule,
 			timeInMinutes,
 			batch,
-			schedulex
+			schedulex,
+			kodeCategory
 		} = this.state;
 		const data = {
 			categoryId: this.state.categoryId,
@@ -179,7 +187,8 @@ class MasterCategory extends Component {
 			desc,
 			schedule: schedulex,
 			timeInMinutes: parseInt(timeInMinutes),
-			batch: sort(batch).asc()
+			batch: sort(batch).asc(),
+			kodeCategory
 		};
 
 		Axios.post(baseurl('category/update'), data)
@@ -222,8 +231,30 @@ class MasterCategory extends Component {
 		return Axios.get(url)
 			.then((response) => {
 				this.setState({ category: response.data, loading: false });
+				console.log(response.data);
 			})
 			.catch((err) => console.log(err));
+	}
+
+	handleFilter = (e) => {
+		e.preventDefault();
+		this.setState({ loading: true });
+
+		const { searchBy, searchValue } = this.state;
+		const data = {
+			searchBy,
+			searchValue
+		};
+		Axios.post(baseurl('category/filter'), data)
+			.then((x) => this.setState({ category: x.data, loading: false }))
+			.catch((err) => {
+				alert(err.data.message);
+				this.setState({ loading: false });
+			});
+	};
+
+	handleKode(e) {
+		this.setState({ kodeCategory: e.target.value });
 	}
 
 	handleHide() {
@@ -233,7 +264,6 @@ class MasterCategory extends Component {
 	render() {
 		const { category, loading, modal } = this.state;
 		const { quizCategory, batch, desc, timeInMinutes, subtitle, schedule } = this.state;
-		console.log(batch);
 		const remove = <Tooltip id="remove_tooltip">Remove</Tooltip>;
 
 		return (
@@ -252,6 +282,19 @@ class MasterCategory extends Component {
 					handleHide={this.handleHide}
 					body={
 						<Form onSubmit={this.handleUpdate}>
+							<Form.Group controlId="formKode">
+								<Form.Label>Kode</Form.Label>
+								<Form.Control
+									autoCapitalize="true"
+									autoComplete="false"
+									type="text"
+									value={this.state.kodeCategory}
+									required={true}
+									placeholder="Enter kode"
+									onChange={this.handleKode}
+								/>
+							</Form.Group>
+
 							<Form.Group controlId="formCategory">
 								<Form.Label>Quiz category</Form.Label>
 								<Form.Control
@@ -384,6 +427,18 @@ class MasterCategory extends Component {
 					</Modal.Header>
 					<Modal.Body>
 						<Form onSubmit={this.handleSubmit}>
+							<Form.Group controlId="formKode">
+								<Form.Label>Kode</Form.Label>
+								<Form.Control
+									autoCapitalize="true"
+									autoComplete="false"
+									type="text"
+									required={true}
+									placeholder="Enter kode"
+									onChange={this.handleKode}
+								/>
+							</Form.Group>
+
 							<Form.Group controlId="formCategory">
 								<Form.Label>Quiz category</Form.Label>
 								<Form.Control
@@ -391,7 +446,6 @@ class MasterCategory extends Component {
 									autoComplete="false"
 									type="text"
 									required={true}
-									value={quizCategory}
 									placeholder="Enter category"
 									onChange={this.handleCategory}
 								/>
@@ -404,7 +458,6 @@ class MasterCategory extends Component {
 									autoComplete="false"
 									type="text"
 									required={true}
-									value={subtitle}
 									placeholder="Enter subtitle"
 									onChange={this.handleSubtitle}
 								/>
@@ -417,7 +470,6 @@ class MasterCategory extends Component {
 									autoCapitalize="true"
 									autoComplete="false"
 									required={true}
-									value={desc}
 									placeholder="Enter description"
 									rows={5}
 									onChange={this.handleDesc}
@@ -446,7 +498,6 @@ class MasterCategory extends Component {
 									autoComplete="false"
 									type="number"
 									required={true}
-									value={timeInMinutes}
 									placeholder="Waktu pengerjaan"
 									onChange={this.handleTime}
 								/>
@@ -518,75 +569,179 @@ class MasterCategory extends Component {
 									</button>
 								}
 								content={
-									<Row>
-										{loading && <Col md={12}>Loading, please wait...</Col>}
-										{category.map((x, i) => (
-											<Col key={i} md={3}>
-												<Card
-													// style={{ height: '' }}
-													title={x.category}
-													category={
-														'Jadwal : ' +
-														moment(x.schedule.iso).format('DD/MM/YYYY')
-													}
-													stats={moment(x.updatedAt).fromNow()}
-													statsIcon="pe-7s-clock"
-													content={
-														<div id="chartActivity" className="">
-															{x.description}
-														</div>
-													}
-													legend={
-														<div className="legend">
-															<Link
-																to={`/admin/list/${x.objectId}/category`}
-															>
-																<button
-																	type="button"
-																	className="btn btn-circle btn-primary"
-																	onClick={() => {
-																		console.log(x.schedule);
-																	}}
-																	style={{ marginRight: '5px' }}
-																>
-																	<span className="btn-label">
-																		<i className="fa fa-eye" />
-																	</span>
-																</button>
-															</Link>
-															<button
-																type="button"
-																className="btn btn-circle btn-danger"
-																onClick={() =>
-																	this.handleEdit(x.objectId, i)}
-															>
-																<span className="btn-label">
-																	<i className="fa fa-pencil" />
-																</span>
-															</button>
-															<button
-																type="button"
-																className="btn btn-circle btn-warning"
-																style={{ marginLeft: '5px' }}
-																onClick={() => {
+									<div>
+										<Row>
+											<Col>
+												<Form onSubmit={this.handleFilter}>
+													<Form.Group
+														as={Row}
+														controlId={'formHorizontalEmail'}
+													>
+														<Col
+															sm={{ span: 4 }}
+															className="pull-right"
+														>
+															<Form.Control
+																as="select"
+																// defaultValue={1}
+																onChange={(e) => {
+																	console.log(e.target.value);
 																	this.setState({
-																		deleteMode: true,
-																		categoryIndex: i,
-																		categoryDesc: x.category,
-																		categoryId: x.objectId
+																		searchBy: e.target.value
 																	});
 																}}
+																required="true"
 															>
-																<span className="btn-label">
-																	<i className="fa fa-trash" />
-																</span>
-															</button>
-														</div>
-													}
-												/>
+																<option value="">
+																	Cari berdasarkan
+																</option>
+																{[
+																	'Kode',
+																	'Nama Kategori'
+																].map((x) => (
+																	<option value={x}>{x}</option>
+																))}
+															</Form.Control>
+														</Col>
+														<Col
+															sm={{ span: 6 }}
+															className="pull-right"
+														>
+															<Form.Control
+																type={
+																	this.state.searchBy ===
+																	'Batch' ? (
+																		'number'
+																	) : (
+																		'text'
+																	)
+																}
+																disabled={
+																	this.state.searchBy === '' ? (
+																		true
+																	) : (
+																		false
+																	)
+																}
+																placeholder={
+																	this.state.searchBy === '' ? (
+																		''
+																	) : (
+																		`Masukkan ${this.state
+																			.searchBy}`
+																	)
+																}
+																//value={startDate}
+																onChange={(e) => {
+																	this.setState({
+																		searchValue: e.target.value
+																	});
+																}}
+																required="true"
+															/>
+														</Col>
+														{/* <Col sm={{ span: 3 }} className="pull-right">
+														<Form.Control
+															type="date"
+															value={endDate}
+															onChange={(e) => {
+																this.setState({ endDate: e.target.value })
+															}}
+															required
+														/>
+													</Col> */}
+														<Button
+															variant="primary"
+															type="submit"
+															disable={loading ? 'true' : 'false'}
+															className="mr-2 m-1"
+															// onClick={this.handleFilterCalendar}
+														>
+															<i className="fa fa-search" />{' '}
+															{loading ? 'Fetching...' : 'Search'}
+														</Button>
+													</Form.Group>
+												</Form>
 											</Col>
-										))}
-									</Row>
+										</Row>
+										<Row>
+											{loading && <Col md={12}>Loading, please wait...</Col>}
+											{category.map((x, i) => (
+												<Col key={i} md={3}>
+													<Card
+														// style={{ height: '' }}
+														title={x.category}
+														category={
+															'Jadwal : ' +
+															moment(x.schedule.iso).format(
+																'DD/MM/YYYY'
+															)
+														}
+														stats={moment(x.updatedAt).fromNow()}
+														statsIcon="pe-7s-clock"
+														content={
+															<div id="chartActivity" className="">
+																{x.description}
+															</div>
+														}
+														legend={
+															<div className="legend">
+																<Link
+																	to={`/admin/list/${x.objectId}/category`}
+																>
+																	<button
+																		type="button"
+																		className="btn btn-circle btn-primary"
+																		onClick={() => {
+																			console.log(x.schedule);
+																		}}
+																		style={{
+																			marginRight: '5px'
+																		}}
+																	>
+																		<span className="btn-label">
+																			<i className="fa fa-eye" />
+																		</span>
+																	</button>
+																</Link>
+																<button
+																	type="button"
+																	className="btn btn-circle btn-danger"
+																	onClick={() =>
+																		this.handleEdit(
+																			x.objectId,
+																			i
+																		)}
+																>
+																	<span className="btn-label">
+																		<i className="fa fa-pencil" />
+																	</span>
+																</button>
+																<button
+																	type="button"
+																	className="btn btn-circle btn-warning"
+																	style={{ marginLeft: '5px' }}
+																	onClick={() => {
+																		this.setState({
+																			deleteMode: true,
+																			categoryIndex: i,
+																			categoryDesc:
+																				x.category,
+																			categoryId: x.objectId
+																		});
+																	}}
+																>
+																	<span className="btn-label">
+																		<i className="fa fa-trash" />
+																	</span>
+																</button>
+															</div>
+														}
+													/>
+												</Col>
+											))}
+										</Row>
+									</div>
 								}
 							/>
 						</Col>

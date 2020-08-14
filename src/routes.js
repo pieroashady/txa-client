@@ -16,12 +16,14 @@
 
 */
 import Dashboard from 'views/Dashboard.jsx';
-import UserProfile from 'views/MasterReport.jsx';
+import MasterReport from 'views/MasterReport.jsx';
+import UserProfile from 'views/UserProfile.jsx';
 import MasterCategory from 'views/Category/MasterCategory';
 import QuizList from 'views/Category/QuizList';
 import MasterContent from 'views/Content/MasterContent';
 import UserScore from 'views/Score/UserScore';
 import ScoreList from 'views/Score/ScoreList';
+import Admin from 'views/Admin.jsx';
 
 const dashboardRoutes = [
 	{
@@ -76,6 +78,13 @@ const dashboardRoutes = [
 		layout: '/admin'
 	},
 	{
+		path: '/daftar-admin',
+		name: 'Master Admin',
+		icon: 'pe-7s-user',
+		component: Admin,
+		layout: '/admin'
+	},
+	{
 		path: '/quiz/:id',
 		name: 'Data Pengerjaan',
 		icon: 'pe-7s-science',
@@ -96,8 +105,7 @@ const dashboardRoutes = [
 		name: 'Master Report',
 		icon: 'pe-7s-science',
 		component: MasterReport,
-		layout: '/admin',
-		invisible: true
+		layout: '/admin'
 	}
 	// {
 	// 	path: '/table',

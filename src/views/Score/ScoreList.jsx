@@ -17,13 +17,14 @@
 */
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Container, Row, Col, Table, Tooltip, Button, OverlayTrigger } from 'react-bootstrap';
+import { Container, Row, Col, Table, Tooltip, Button, OverlayTrigger, Form } from 'react-bootstrap';
 
 import Card from 'components/Card/Card.jsx';
 import { thArray, tdArray } from 'variables/Variables.jsx';
 import { Link } from 'react-router-dom';
 import { baseurl } from 'utils/baseurl';
 import moment from 'moment';
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 
 class ScoreList extends Component {
 	constructor(props) {
@@ -64,54 +65,170 @@ class ScoreList extends Component {
 					<Row>
 						<Col md={12}>
 							<Card
+								title={
+									<ReactHTMLTableToExcel
+										id="eskport"
+										className="btn btn-primary"
+										table="ekspor"
+										filename="tablexls"
+										sheet="tablexls"
+										buttonText="Ekspor"
+									/>
+								}
 								category="Data pengerjaan minggu ini"
-								ctTableFullWidth
-								ctTableResponsive
 								content={
-									<Table striped hover>
-										<thead>
-											<tr>
-												<th>NO</th>
-												<th>NAMA</th>
-												<th>QUIZ</th>
-												<th>SCORE</th>
-												<th>SUBMIT</th>
-												<th>STATUS</th>
-											</tr>
-										</thead>
-										<tbody key={1}>
-											{score.length < 1 ? (
-												<tr>
-													<td colSpan={6} style={{ textAlign: 'center' }}>
-														NO DATA FOUND
-													</td>
-												</tr>
-											) : (
-												score.map((prop, key) => (
-													<tr key={key}>
-														<td>{key + 1}</td>
-														<td>{prop.userId.fullname}</td>
-														<td>{prop.categoryId.category}</td>
-														<td>{prop.score}</td>
-														<td>
-															{moment(prop.createdAt).format(
-																'DD/MM/YYYY [at] HH:mm:ss'
-															)}
-														</td>
-														<td
-															style={{
-																color: `${prop.passed
-																	? 'blue'
-																	: 'red'}`
-															}}
+									<div>
+										<Row>
+											<Col>
+												<Form onSubmit={this.handleFilter}>
+													<Form.Group
+														as={Row}
+														controlId={'formHorizontalEmail'}
+													>
+														<Col
+															sm={{ span: 4 }}
+															className="pull-right"
 														>
-															{prop.passed ? 'LULUS' : 'TIDAK LULUS'}
-														</td>
+															<Form.Control
+																as="select"
+																// defaultValue={1}
+																onChange={(e) => {
+																	console.log(e.target.value);
+																	this.setState({
+																		searchBy: e.target.value
+																	});
+																}}
+																required="true"
+															>
+																<option value="">
+																	Cari berdasarkan
+																</option>
+																{[
+																	'Nomor Induk',
+																	'Nama',
+																	'Batch',
+																	'Status'
+																].map((x) => (
+																	<option value={x}>{x}</option>
+																))}
+															</Form.Control>
+														</Col>
+														<Col
+															sm={{ span: 6 }}
+															className="pull-right"
+														>
+															<Form.Control
+																type={
+																	this.state.searchBy ===
+																	'Batch' ? (
+																		'number'
+																	) : (
+																		'text'
+																	)
+																}
+																disabled={
+																	this.state.searchBy ===
+																	undefined ? (
+																		true
+																	) : (
+																		false
+																	)
+																}
+																placeholder={
+																	this.state.searchBy ===
+																	undefined ? (
+																		''
+																	) : (
+																		`Masukkan ${this.state
+																			.searchBy}`
+																	)
+																}
+																//value={startDate}
+																onChange={(e) => {
+																	console.log(e.target.value);
+																	this.setState({
+																		searchValue: e.target.value
+																	});
+																}}
+																required="true"
+															/>
+														</Col>
+														{/* <Col sm={{ span: 3 }} className="pull-right">
+														<Form.Control
+															type="date"
+															value={endDate}
+															onChange={(e) => {
+																this.setState({ endDate: e.target.value })
+															}}
+															required
+														/>
+													</Col> */}
+														<Button
+															variant="primary"
+															type="submit"
+															disable={loading ? 'true' : 'false'}
+															className="mr-2 m-1"
+															// onClick={this.handleFilterCalendar}
+														>
+															<i className="fa fa-search" />{' '}
+															{loading ? 'Fetching...' : 'Search'}
+														</Button>
+													</Form.Group>
+												</Form>
+											</Col>
+										</Row>
+										<Row>
+											<Table striped hover id="ekspor">
+												<thead>
+													<tr>
+														<th>NAMA</th>
+														<th>QUIZ</th>
+														<th>SCORE</th>
+														<th>SUBMIT</th>
+														<th>STATUS</th>
 													</tr>
-												))
-											)}
-										</tbody>
-									</Table>
+												</thead>
+												<tbody key={1}>
+													{score.length < 1 ? (
+														<tr>
+															<td
+																colSpan={6}
+																style={{ textAlign: 'center' }}
+															>
+																NO DATA FOUND
+															</td>
+														</tr>
+													) : (
+														score.map((prop, key) => (
+															<tr key={key}>
+																<td>{prop.userId.fullname}</td>
+																<td>{prop.categoryId.category}</td>
+																<td>{prop.score}</td>
+																<td>
+																	{moment(prop.createdAt).format(
+																		'DD/MM/YYYY [at] HH:mm:ss'
+																	)}
+																</td>
+																<td
+																	style={{
+																		color: `${prop.passed
+																			? 'blue'
+																			: 'red'}`
+																	}}
+																>
+																	{prop.passed ? (
+																		'LULUS'
+																	) : (
+																		'TIDAK LULUS'
+																	)}
+																</td>
+															</tr>
+														))
+													)}
+												</tbody>
+											</Table>
+										</Row>
+									</div>
 								}
 							/>
 						</Col>
